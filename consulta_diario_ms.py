@@ -136,7 +136,7 @@ def consultar_api_doe(
             params["dataFim"] = data_fim.strftime("%Y-%m-%d")
 
         try:
-            resp = requests.get(URL_BUSCA, params=params, headers=HEADERS, timeout=30)
+            resp = requests.get(URL_BUSCA, params=params, headers=HEADERS, timeout=30, verify=False)
             resp.raise_for_status()
             dados = resp.json()
         except requests.exceptions.ConnectionError:
