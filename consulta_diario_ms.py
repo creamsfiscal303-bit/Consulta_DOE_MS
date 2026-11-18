@@ -135,9 +135,21 @@ def consultar_api_doe(
         if data_fim:
             params["dataFim"] = data_fim.strftime("%Y-%m-%d")
 
-        resp = requests.get(URL_BUSCA, params=params, headers=HEADERS, timeout=30)
-        resp.raise_for_status()
-        dados = resp.json()
+        try:
+            resp = requests.get(URL_BUSCA, params=params, headers=HEADERS, timeout=30)
+            resp.raise_for_status()
+            dados = resp.json()
+        except requests.exceptions.ConnectionError:
+            st.error(
+                "Não foi possível conectar ao servidor do Diário Oficial de MS. "
+                "O portal do governo bloqueia acessos vindos de servidores fora do Brasil (como o Streamlit Cloud). "
+                "Execute este painel localmente no seu computador ou em um servidor hospedado no Brasil."
+            )
+            return []
+        except requests.exceptions.RequestException as e:
+            st.error(f"Erro ao consultar a API do DOE-MS: {e}")
+            return []
+
 
         itens = dados.get("paginasDiario", [])
         if not itens:
