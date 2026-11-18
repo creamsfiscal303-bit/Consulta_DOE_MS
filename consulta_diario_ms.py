@@ -4,6 +4,18 @@ from datetime import date, timedelta
 import pandas as pd
 import requests
 import streamlit as st
+import socket
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Contorno de DNS: resolve www.diariooficial.ms.gov.br direto para o IP oficial (187.86.226.249)
+_orig_getaddrinfo = socket.getaddrinfo
+def _custom_getaddrinfo(host, port, *args, **kwargs):
+    if host in ("www.diariooficial.ms.gov.br", "diariooficial.ms.gov.br"):
+        return _orig_getaddrinfo("187.86.226.249", port, *args, **kwargs)
+    return _orig_getaddrinfo(host, port, *args, **kwargs)
+socket.getaddrinfo = _custom_getaddrinfo
 
 # Configuração da página
 st.set_page_config(page_title="Monitoramento DOE-MS", page_icon="📰", layout="wide")
